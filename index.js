@@ -6,13 +6,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Load API key from environment variable
+// OpenAI API key from environment
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
-// Browser check
+// Test route
 app.get("/", (req, res) => {
   res.send("✅ Roblox AI Server is running!");
 });
@@ -20,6 +20,7 @@ app.get("/", (req, res) => {
 // AI endpoint
 app.post("/ai", async (req, res) => {
   const prompt = req.body.prompt || "";
+  console.log("Received prompt:", prompt);
 
   try {
     const completion = await openai.createChatCompletion({
