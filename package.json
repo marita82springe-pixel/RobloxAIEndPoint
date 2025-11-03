@@ -1,7 +1,7 @@
 {
   "name": "roblox-ai-server",
   "version": "1.0.0",
-  "type": "module",
+  "type": "module",  // <- VERY important for ES import
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
