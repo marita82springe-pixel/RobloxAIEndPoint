@@ -6,15 +6,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Load API key from environment variable
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
+// Browser check
 app.get("/", (req, res) => {
   res.send("✅ Roblox AI Server is running!");
 });
 
+// AI endpoint
 app.post("/ai", async (req, res) => {
   const prompt = req.body.prompt || "";
 
@@ -25,6 +28,7 @@ app.post("/ai", async (req, res) => {
     });
 
     const reply = completion.data.choices[0].message.content;
+    console.log("GPT reply:", reply); // debug
     res.json({ reply });
   } catch (err) {
     console.error(err);
