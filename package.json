@@ -1,7 +1,11 @@
 {
-  "name": "robloxai",
+  "name": "roblox-ai-server",
   "version": "1.0.0",
+  "description": "Roblox AI server using GPT",
   "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
