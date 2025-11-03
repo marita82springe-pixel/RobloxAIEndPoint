@@ -1,12 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const { Configuration, OpenAIApi } = require("openai");
-const app = express();
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-// OpenAI API key from environment
+// Load OpenAI API key from environment variable
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 // AI endpoint
 app.post("/ai", async (req, res) => {
   const prompt = req.body.prompt || "";
-  console.log("Received prompt:", prompt);
+  console.log("Received prompt:", prompt); // debug log
 
   try {
     const completion = await openai.createChatCompletion({
@@ -29,13 +29,17 @@ app.post("/ai", async (req, res) => {
     });
 
     const reply = completion.data.choices[0].message.content;
-    console.log("GPT reply:", reply); // debug
+    console.log("GPT reply:", reply); // debug log
     res.json({ reply });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error calling GPT:", error);
     res.status(500).json({ reply: "Error: Could not get AI response." });
   }
 });
 
+// Start server on Render port
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
