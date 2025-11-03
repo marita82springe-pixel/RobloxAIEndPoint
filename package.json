@@ -1,14 +1,16 @@
 {
-  "name": "roblox-ai-server",
+  "name": "roblox-ai-endpoint",
   "version": "1.0.0",
-  "type": "module",  // <- VERY important for ES import
+  "description": "AI endpoint for Roblox game",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "openai": "^5.0.0"
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
