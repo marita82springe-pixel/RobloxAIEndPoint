@@ -1,17 +1,16 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-import fetch from "node-fetch";
+const express = require("express");
+const bodyParser = require("body-parser");
+const fetch = require("node-fetch");
 
 const app = express();
-app.use(cors());
 app.use(bodyParser.json());
 
-app.post("/ai", async (req, res) => {
-  const { prompt } = req.body;
-  console.log("Received prompt:", prompt);
+app.get("/", (req, res) => {
+  res.send("✅ Roblox AI Endpoint is running!");
+});
 
-  if (!prompt) return res.status(400).json({ error: "Missing prompt" });
+app.post("/ai", async (req, res) => {
+  const prompt = req.body.prompt || "Hello there!";
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -27,23 +26,13 @@ app.post("/ai", async (req, res) => {
     });
 
     const data = await response.json();
-    console.log("AI response:", data);
+    const aiReply = data.choices?.[0]?.message?.content || "No response from AI.";
 
-    if (data.choices && data.choices.length > 0) {
-      res.json({ reply: data.choices[0].message.content });
-    } else {
-      res.json({ reply: "⚠️ No response from AI." });
-    }
-  } catch (err) {
-    console.error("AI request failed:", err);
-    res.json({ reply: "⚠️ Server error, try again later." });
+    res.json({ reply: aiReply });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ reply: "Server error connecting to AI." });
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("✅ Roblox AI Endpoint is running!");
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
-
+app.listen(10000, () => console.log("✅ Roblox AI Server running on port 10000"));
