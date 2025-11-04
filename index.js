@@ -1,6 +1,6 @@
-import express from "express";
-import bodyParser from "body-parser";
-import fetch from "node-fetch";
+const express = require("express");
+const bodyParser = require("body-parser");
+const fetch = require("node-fetch");
 
 const app = express();
 app.use(bodyParser.json());
@@ -17,7 +17,7 @@ app.post("/ai", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
