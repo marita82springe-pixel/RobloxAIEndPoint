@@ -1,50 +1,56 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const fetch = require("node-fetch");
+const OpenAI = require("openai");
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Test route
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 app.get("/", (req, res) => {
   res.send("✅ Roblox AI Endpoint is running!");
 });
 
-// AI route
 app.post("/ai", async (req, res) => {
-  const prompt = req.body.prompt || "Hello!";
+  const prompt = typeof req.body.prompt === "string" ? req.body.prompt.trim() : "";
+  const userId = req.body.userId ?? "unknown";
+  const conversationId = req.body.conversationId ?? "default";
+
+  if (!prompt) {
+    return res.status(400).json({ reply: "Please send a prompt." });
+  }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }]
-      })
+    const response = await client.responses.create({
+      model: "gpt-5.4",
+      input: [
+        {
+          role: "system",
+          content: "You are a helpful Roblox in-game AI assistant. Keep replies clear, friendly, and fairly short."
+        },
+        {
+          role: "user",
+          content: `User ${userId} in conversation ${conversationId} says: ${prompt}`
+        }
+      ]
     });
 
-    const data = await response.json();
-
-    // 🔹 Log everything returned by OpenAI
-    console.log("OpenAI raw response:", JSON.stringify(data, null, 2));
-
-    if (data.error) {
-      console.error("OpenAI returned error:", data.error);
-      return res.json({ reply: `OpenAI error: ${data.error.message}` });
-    }
-
-    const aiReply = data.choices?.[0]?.message?.content || "No response from AI.";
-    res.json({ reply: aiReply });
+    const reply = response.output_text || "No response from AI.";
+    res.json({ reply });
   } catch (error) {
-    console.error("OpenAI fetch error:", error);
-    res.status(500).json({ reply: "Server error connecting to AI." });
+    console.error("OpenAI error:", error);
+
+    const message =
+      error?.status === 401 ? "OpenAI key is invalid or missing."
+      : error?.status === 429 ? "OpenAI quota or rate limit reached."
+      : "Server error connecting to AI.";
+
+    res.status(500).json({ reply: message });
   }
 });
 
-// Start server
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`✅ Roblox AI Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Roblox AI Server running on port ${PORT}`);
+});
